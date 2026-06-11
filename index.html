@@ -438,7 +438,7 @@ const FOODS = [
         }
     },
     {
-        name: '小笼包', emoji: '🥟♨️',
+        name: '小笼包', emoji: '♨️',
         desc: '薄皮多汁的小笼包，一口一个，满口鲜香。',
         scores: { weather: {sunny:0, cloudy:1, overcast:1, foggy:1, rainy:1}, mood: {happy:1,sad:1,stressed:0,tired:1,bored:0}, appetite: {low:2,normal:2,high:0}, fullness: {hungry:1,light:2,full:-1} },
         reason: function(w,m,a,f,meal) {
@@ -477,7 +477,7 @@ const FOODS = [
         }
     },
     {
-        name: '饺子', emoji: '',
+        name: '饺子', emoji: '🥟',
         desc: '皮薄馅大的手工饺子，蘸醋吃最香。',
         scores: { weather: {sunny:-1, cloudy:1, overcast:2, foggy:2, rainy:2}, mood: {happy:1,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:1,normal:2,high:1}, fullness: {hungry:2,light:1,full:-2} },
         reason: function(w,m,a,f,meal) {
@@ -823,7 +823,7 @@ function getRecommendation() {
 
     return {
         name: pick.food.name,
-        emoji: pick.food.emoji ?? '🍽️',
+        emoji: pick.food.emoji || '🍽️',
         desc: pick.food.desc,
         reason: `<strong>${reason}</strong>${extra}`
     };
