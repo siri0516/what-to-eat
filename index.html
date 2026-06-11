@@ -342,7 +342,8 @@ const FOODS = [
         name: '重庆火锅', emoji: '🍲',
         desc: '麻辣鲜香的火锅，涮什么都好吃！',
         scores: { weather: {sunny:-2, cloudy:0, overcast:3, foggy:3, rainy:3}, mood: {happy:2,sad:3,stressed:3,tired:1,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-3} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '大早上吃火锅有点过于硬核了...';
             if (w==='overcast') return '阴天或起雾，吃火锅暖身最合适';
             if (w==='rainy') return '下雨天和火锅最配了';
             if (m==='stressed') return '焦虑的时候，辣味最能释放压力';
@@ -354,7 +355,8 @@ const FOODS = [
         name: '酸菜鱼', emoji: '🐟',
         desc: '酸爽开胃，鱼肉鲜嫩，配米饭能吃到撑！',
         scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:2,tired:2,bored:1}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:3,light:0,full:-3} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早上吃酸菜鱼有点重口...';
             if (m==='tired') return '酸爽的口味最能提振精神';
             if (w==='overcast'||w==='rainy') return '这种天气来份酸菜鱼，暖胃又开胃';
             return '酸菜鱼，酸爽嫩滑吃不够';
@@ -364,7 +366,8 @@ const FOODS = [
         name: '兰州拉面', emoji: '🍜',
         desc: '一碗热腾腾的牛肉拉面，汤清味浓，暖心暖胃。',
         scores: { weather: {sunny:-1, cloudy:0, overcast:3, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:0,normal:2,high:2}, fullness: {hungry:3,light:0,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早上来碗热拉面，暖暖胃';
             if (w==='overcast'||w==='foggy') return '阴天或起雾，来碗热拉面暖暖身子';
             if (w==='rainy') return '下雨天就适合来碗热气腾腾的拉面';
             if (m==='tired') return '累了就来碗拉面，吃饱就有力气了';
@@ -375,7 +378,8 @@ const FOODS = [
         name: '蛋炒饭', emoji: '🍚',
         desc: '简单却经典的蛋炒饭，粒粒分明，朴实的美味。',
         scores: { weather: {sunny:0, cloudy:1, overcast:1, foggy:1, rainy:1}, mood: {happy:1,sad:0,stressed:0,tired:1,bored:-1}, appetite: {low:1,normal:2,high:1}, fullness: {hungry:3,light:0,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早餐蛋炒饭，简单管饱还快手';
             if (f==='hungry') return '饿了吧？蛋炒饭又快又管饱！';
             if (a==='low') return '没什么胃口的时候，蛋炒饭简单又稳妥';
             return '蛋炒饭，最简单也最安心';
@@ -385,7 +389,8 @@ const FOODS = [
         name: '麻辣烫', emoji: '🌶️',
         desc: '自选食材，麻辣鲜香，一碗满足所有欲望。',
         scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:3,tired:1,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:1,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早上吃麻辣烫有点重口...';
             if (m==='stressed') return '压力大的时候，麻辣烫最能解压';
             return '想吃什么自己选，麻辣烫永远不会错';
         }
@@ -394,7 +399,8 @@ const FOODS = [
         name: '寿司', emoji: '🍣',
         desc: '精致鲜美的日式寿司，轻食首选。',
         scores: { weather: {sunny:3, cloudy:1, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:2,sad:1,stressed:0,tired:0,bored:2}, appetite: {low:1,normal:1,high:0}, fullness: {hungry:0,light:2,full:-1} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早上吃寿司太凉了，换点热乎的吧';
             if (w==='sunny') return '晴天的好日子，吃寿司最清爽';
             if (m==='bored') return '生活无聊？来点精致的寿司换换心情';
             return '寿司，清爽又精致的小确幸';
@@ -423,7 +429,8 @@ const FOODS = [
         name: '烤肉', emoji: '🥩',
         desc: '滋滋冒油的烤肉，肉食者的天堂！',
         scores: { weather: {sunny:0, cloudy:2, overcast:2, foggy:1, rainy:1}, mood: {happy:3,sad:1,stressed:2,tired:1,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-3} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早餐吃烤肉也太硬核了...';
             if (m==='happy') return '心情这么好，必须来顿烤肉庆祝！';
             if (a==='high') return '胃口大开？烤肉大餐安排上！';
             if (m==='bored') return '无聊？没有什么是一顿烤肉解决不了的';
@@ -434,7 +441,8 @@ const FOODS = [
         name: '小笼包', emoji: '🥟',
         desc: '薄皮多汁的小笼包，一口一个，满口鲜香。',
         scores: { weather: {sunny:0, cloudy:1, overcast:1, foggy:1, rainy:1}, mood: {happy:1,sad:1,stressed:0,tired:1,bored:0}, appetite: {low:2,normal:2,high:0}, fullness: {hungry:1,light:2,full:-1} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早餐小笼包配碗粥，完美！';
             if (a==='low') return '没胃口的时候，小笼包皮薄馅嫩刚刚好';
             return '小笼包，一口一个的幸福';
         }
@@ -443,7 +451,8 @@ const FOODS = [
         name: '冰淇淋', emoji: '🍦',
         desc: '甜蜜冰凉的冰淇淋，一秒降温，心情变好！',
         scores: { weather: {sunny:3, cloudy:1, overcast:-2, foggy:-3, rainy:-2}, mood: {happy:2,sad:3,stressed:1,tired:0,bored:1}, appetite: {low:1,normal:0,high:-1}, fullness: {hungry:-3,light:1,full:-1} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早餐吃冰淇淋？胃会抗议的...';
             if (w==='sunny') return '热到融化？来支冰淇淋续命！';
             return '冰淇淋是快乐源泉！';
         }
@@ -471,7 +480,8 @@ const FOODS = [
         name: '饺子', emoji: '🥟',
         desc: '皮薄馅大的手工饺子，蘸醋吃最香。',
         scores: { weather: {sunny:-1, cloudy:1, overcast:2, foggy:2, rainy:2}, mood: {happy:1,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:1,normal:2,high:1}, fullness: {hungry:2,light:1,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早上来盘饺子，管饱又暖和';
             if (w==='overcast'||w==='rainy') return '阴天或雨天，吃饺子最暖心';
             if (f==='hungry') return '饿的时候，饺子管饱又满足';
             return '饺子，家的味道';
@@ -491,7 +501,8 @@ const FOODS = [
         name: '清粥小菜', emoji: '🥣',
         desc: '温热白粥配几碟小菜，清淡养胃。',
         scores: { weather: {sunny:-1, cloudy:0, overcast:1, foggy:1, rainy:2}, mood: {happy:0,sad:2,stressed:0,tired:1,bored:-1}, appetite: {low:3,normal:0,high:-2}, fullness: {hungry:-1,light:2,full:0} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早上喝碗清粥配小菜，暖胃又舒服';
             if (a==='low') return '完全没胃口？喝碗清粥养养胃';
             if (m==='sad') return '难过得吃不下的时候，粥最温柔';
             return '清淡的粥，是对胃的温柔';
@@ -511,7 +522,8 @@ const FOODS = [
         name: '炸鸡啤酒', emoji: '🍗',
         desc: '酥脆炸鸡配冰啤酒，快乐肥宅套餐！',
         scores: { weather: {sunny:2, cloudy:1, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:2,sad:3,stressed:2,tired:0,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '大清早的炸鸡啤酒也太硬核了...';
             if (m==='sad') return '难过的时候，炸鸡啤酒最治愈';
             if (m==='bored') return '无聊的晚上，炸鸡啤酒是标配';
             return '炸鸡啤酒，快乐就是这么简单';
@@ -521,7 +533,8 @@ const FOODS = [
         name: '肠粉', emoji: '🫘',
         desc: '滑嫩细腻的广式肠粉，早餐轻食两相宜。',
         scores: { weather: {sunny:1, cloudy:1, overcast:0, foggy:0, rainy:0}, mood: {happy:1,sad:1,stressed:0,tired:1,bored:0}, appetite: {low:2,normal:1,high:0}, fullness: {hungry:0,light:2,full:-1} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早餐来份肠粉，滑嫩又舒服';
             if (a==='low') return '没什么胃口？来份滑嫩的肠粉正好';
             return '肠粉，滑滑嫩嫩，简简单单';
         }
@@ -530,7 +543,8 @@ const FOODS = [
         name: '烧烤', emoji: '🍢',
         desc: '炭火慢烤的串串，烟火气十足，越夜越美味。',
         scores: { weather: {sunny:3, cloudy:2, overcast:-1, foggy:-1, rainy:-2}, mood: {happy:3,sad:1,stressed:2,tired:0,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '一大早就吃烧烤也太硬核了...';
             if (w==='sunny') return '晴天的夜晚，烧烤啤酒最配了';
             if (m==='happy') return '这么开心的日子，必须烧烤走起！';
             return '烧烤，人间烟火气最抚凡人心';
@@ -600,7 +614,8 @@ const FOODS = [
         name: '米线', emoji: '🍜',
         desc: '爽滑米线配上浓郁汤底，暖心暖胃，一碗就饱。',
         scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:0,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:1,normal:2,high:1}, fullness: {hungry:2,light:1,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早上来碗热米线，暖胃又舒服';
             if (w==='foggy'||w==='rainy') return '起雾或下雨，来碗热米线最舒服';
             if (m==='tired') return '累了？一碗米线下去，元气满满';
             return '米线，爽滑汤浓，简简单单的美味';
@@ -630,7 +645,8 @@ const FOODS = [
         name: '小龙虾', emoji: '🦞',
         desc: '麻辣鲜香的小龙虾，剥壳的乐趣谁能抵抗！',
         scores: { weather: {sunny:3, cloudy:2, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:3,sad:1,stressed:2,tired:0,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-2} },
-        reason: function(w,m,a,f) {
+        reason: function(w,m,a,f,meal) {
+            if (meal==='breakfast') return '早餐吃小龙虾也太硬核了...';
             if (w==='sunny') return '晴朗的日子，小龙虾配啤酒最过瘾';
             if (m==='happy') return '心情这么好，来份小龙虾庆祝！';
             return '小龙虾，剥壳的快乐谁吃谁知道';
@@ -647,6 +663,41 @@ const FOODS = [
         }
     }
 ];
+
+// ---------- 餐类评分（与FOODS分离便于维护）----------
+const MEAL_SCORES = {
+    '重庆火锅':{breakfast:-3,lunch:2,dinner:3,night:1},
+    '酸菜鱼':{breakfast:-2,lunch:2,dinner:2,night:-1},
+    '兰州拉面':{breakfast:1,lunch:2,dinner:2,night:1},
+    '蛋炒饭':{breakfast:1,lunch:2,dinner:1,night:0},
+    '麻辣烫':{breakfast:-2,lunch:2,dinner:2,night:1},
+    '寿司':{breakfast:-3,lunch:2,dinner:1,night:-1},
+    '黄焖鸡米饭':{breakfast:-2,lunch:2,dinner:2,night:0},
+    '凉皮':{breakfast:0,lunch:2,dinner:0,night:-2},
+    '烤肉':{breakfast:-3,lunch:1,dinner:3,night:2},
+    '小笼包':{breakfast:3,lunch:2,dinner:1,night:0},
+    '冰淇淋':{breakfast:-3,lunch:1,dinner:0,night:0},
+    '螺蛳粉':{breakfast:-2,lunch:1,dinner:2,night:1},
+    '糖醋里脊':{breakfast:-2,lunch:2,dinner:2,night:0},
+    '饺子':{breakfast:1,lunch:2,dinner:2,night:1},
+    '麻辣香锅':{breakfast:-3,lunch:1,dinner:3,night:2},
+    '清粥小菜':{breakfast:3,lunch:1,dinner:-1,night:1},
+    '披萨':{breakfast:-2,lunch:2,dinner:2,night:1},
+    '炸鸡啤酒':{breakfast:-3,lunch:0,dinner:2,night:3},
+    '肠粉':{breakfast:3,lunch:2,dinner:0,night:-2},
+    '烧烤':{breakfast:-3,lunch:0,dinner:3,night:3},
+    '煲仔饭':{breakfast:-2,lunch:2,dinner:2,night:0},
+    '甜品奶茶':{breakfast:-2,lunch:1,dinner:1,night:2},
+    '水煮鱼':{breakfast:-3,lunch:2,dinner:2,night:0},
+    '咖喱饭':{breakfast:-1,lunch:2,dinner:2,night:0},
+    '水果拼盘':{breakfast:2,lunch:1,dinner:0,night:-1},
+    '烤鱼':{breakfast:-3,lunch:1,dinner:3,night:1},
+    '米线':{breakfast:1,lunch:2,dinner:2,night:1},
+    '汉堡薯条':{breakfast:-1,lunch:2,dinner:2,night:1},
+    '日式拉面':{breakfast:0,lunch:2,dinner:2,night:1},
+    '小龙虾':{breakfast:-3,lunch:1,dinner:3,night:2},
+    '部队火锅':{breakfast:-2,lunch:2,dinner:2,night:1}
+};
 
 // ---------- 状态 ----------
 let meal = 'breakfast';
@@ -726,8 +777,10 @@ function getRecommendation() {
         const as = food.scores.appetite[a] || 0;
         const fs = food.scores.fullness[f] || 0;
         const fbAdj = (fb[food.name] || 0) * 1.5;
-        const total = ws * 1.0 + ms * 1.5 + as * 1.5 + fs * 2.0 + fbAdj;
-        return { food, total, ws, ms, as, fs };
+        const mealScores = MEAL_SCORES[food.name] || {};
+        const mealS = mealScores[meal] || 0;
+        const total = ws * 1.0 + ms * 1.5 + as * 1.5 + fs * 2.0 + mealS * 1.5 + fbAdj;
+        return { food, total, ws, ms, as, fs, mealS };
     });
 
     scored.sort((a, b) => {
@@ -757,8 +810,14 @@ function getRecommendation() {
         const fl = {hungry:'肚子饿',light:'刚好',full:'有点饱'};
         parts.push(fl[f] || '');
     }
+    if (pick.mealS > 1) {
+        const mealL = {breakfast:'适合早餐', lunch:'午餐推荐', dinner:'晚餐推荐', night:'适合夜宵'};
+        parts.push(mealL[meal] || '');
+    } else if (pick.mealS < -1) {
+        parts.push('此时不太推荐');
+    }
 
-    const reason = pick.food.reason(wType, mood, a, f);
+    const reason = pick.food.reason(wType, mood, a, f, meal);
     const extra = parts.length > 0 ? `<br><span style="font-size:0.7rem;color:rgba(255,255,255,0.2);">综合：${parts.join(' · ')}</span>` : '';
 
     return {
