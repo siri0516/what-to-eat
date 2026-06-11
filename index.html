@@ -343,7 +343,7 @@ const FOODS = [
         desc: '麻辣鲜香的火锅，涮什么都好吃！',
         scores: { weather: {sunny:-2, cloudy:0, overcast:3, foggy:3, rainy:3}, mood: {happy:2,sad:3,stressed:3,tired:1,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-3} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '大早上吃火锅有点过于硬核了...';
+            if (meal==='breakfast') return '火锅不太适合当早餐';
             if (w==='overcast') return '阴天或起雾，吃火锅暖身最合适';
             if (w==='rainy') return '下雨天和火锅最配了';
             if (m==='stressed') return '焦虑的时候，辣味最能释放压力';
@@ -356,7 +356,7 @@ const FOODS = [
         desc: '酸爽开胃，鱼肉鲜嫩，配米饭能吃到撑！',
         scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:2,tired:2,bored:1}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:3,light:0,full:-3} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '早上吃酸菜鱼有点重口...';
+            if (meal==='breakfast') return '酸菜鱼适合午餐或晚餐，不太适合早上吃';
             if (m==='tired') return '酸爽的口味最能提振精神';
             if (w==='overcast'||w==='rainy') return '这种天气来份酸菜鱼，暖胃又开胃';
             return '酸菜鱼，酸爽嫩滑吃不够';
@@ -390,7 +390,7 @@ const FOODS = [
         desc: '自选食材，麻辣鲜香，一碗满足所有欲望。',
         scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:3,tired:1,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:1,full:-2} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '早上吃麻辣烫有点重口...';
+            if (meal==='breakfast') return '麻辣烫不太适合早上吃';
             if (m==='stressed') return '压力大的时候，麻辣烫最能解压';
             return '想吃什么自己选，麻辣烫永远不会错';
         }
@@ -400,7 +400,7 @@ const FOODS = [
         desc: '精致鲜美的日式寿司，轻食首选。',
         scores: { weather: {sunny:3, cloudy:1, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:2,sad:1,stressed:0,tired:0,bored:2}, appetite: {low:1,normal:1,high:0}, fullness: {hungry:0,light:2,full:-1} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '早上吃寿司太凉了，换点热乎的吧';
+            if (meal==='breakfast') return '寿司偏凉，不太适合当早餐';
             if (w==='sunny') return '晴天的好日子，吃寿司最清爽';
             if (m==='bored') return '生活无聊？来点精致的寿司换换心情';
             return '寿司，清爽又精致的小确幸';
@@ -430,7 +430,7 @@ const FOODS = [
         desc: '滋滋冒油的烤肉，肉食者的天堂！',
         scores: { weather: {sunny:0, cloudy:2, overcast:2, foggy:1, rainy:1}, mood: {happy:3,sad:1,stressed:2,tired:1,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-3} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '早餐吃烤肉也太硬核了...';
+            if (meal==='breakfast') return '烤肉不太适合早上吃';
             if (m==='happy') return '心情这么好，必须来顿烤肉庆祝！';
             if (a==='high') return '胃口大开？烤肉大餐安排上！';
             if (m==='bored') return '无聊？没有什么是一顿烤肉解决不了的';
@@ -452,7 +452,7 @@ const FOODS = [
         desc: '甜蜜冰凉的冰淇淋，一秒降温，心情变好！',
         scores: { weather: {sunny:3, cloudy:1, overcast:-2, foggy:-3, rainy:-2}, mood: {happy:2,sad:3,stressed:1,tired:0,bored:1}, appetite: {low:1,normal:0,high:-1}, fullness: {hungry:-3,light:1,full:-1} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '早餐吃冰淇淋？胃会抗议的...';
+            if (meal==='breakfast') return '冰淇淋不太适合当早餐';
             if (w==='sunny') return '热到融化？来支冰淇淋续命！';
             return '冰淇淋是快乐源泉！';
         }
@@ -523,7 +523,7 @@ const FOODS = [
         desc: '酥脆炸鸡配冰啤酒，快乐肥宅套餐！',
         scores: { weather: {sunny:2, cloudy:1, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:2,sad:3,stressed:2,tired:0,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '大清早的炸鸡啤酒也太硬核了...';
+            if (meal==='breakfast') return '炸鸡啤酒不太适合早上吃';
             if (m==='sad') return '难过的时候，炸鸡啤酒最治愈';
             if (m==='bored') return '无聊的晚上，炸鸡啤酒是标配';
             return '炸鸡啤酒，快乐就是这么简单';
@@ -544,7 +544,7 @@ const FOODS = [
         desc: '炭火慢烤的串串，烟火气十足，越夜越美味。',
         scores: { weather: {sunny:3, cloudy:2, overcast:-1, foggy:-1, rainy:-2}, mood: {happy:3,sad:1,stressed:2,tired:0,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '一大早就吃烧烤也太硬核了...';
+            if (meal==='breakfast') return '烧烤不太适合当早餐';
             if (w==='sunny') return '晴天的夜晚，烧烤啤酒最配了';
             if (m==='happy') return '这么开心的日子，必须烧烤走起！';
             return '烧烤，人间烟火气最抚凡人心';
@@ -646,7 +646,7 @@ const FOODS = [
         desc: '麻辣鲜香的小龙虾，剥壳的乐趣谁能抵抗！',
         scores: { weather: {sunny:3, cloudy:2, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:3,sad:1,stressed:2,tired:0,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-2} },
         reason: function(w,m,a,f,meal) {
-            if (meal==='breakfast') return '早餐吃小龙虾也太硬核了...';
+            if (meal==='breakfast') return '小龙虾不太适合当早餐';
             if (w==='sunny') return '晴朗的日子，小龙虾配啤酒最过瘾';
             if (m==='happy') return '心情这么好，来份小龙虾庆祝！';
             return '小龙虾，剥壳的快乐谁吃谁知道';
@@ -814,7 +814,7 @@ function getRecommendation() {
         const mealL = {breakfast:'适合早餐', lunch:'午餐推荐', dinner:'晚餐推荐', night:'适合夜宵'};
         parts.push(mealL[meal] || '');
     } else if (pick.mealS < -1) {
-        parts.push('此时不太推荐');
+        parts.push('不太适合这个时段');
     }
 
     const reason = pick.food.reason(wType, mood, a, f, meal);
