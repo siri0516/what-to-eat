@@ -783,6 +783,9 @@ function getRecommendation() {
         return { food, total, ws, ms, as, fs, mealS };
     });
 
+    // 过滤掉不适宜该餐段的食物（如早餐不出小龙虾）
+    scored = scored.filter(item => item.mealS >= 0);
+
     scored.sort((a, b) => {
         if (Math.abs(b.total - a.total) < 0.5) return Math.random() - 0.5;
         return b.total - a.total;
@@ -810,11 +813,9 @@ function getRecommendation() {
         const fl = {hungry:'肚子饿',light:'刚好',full:'有点饱'};
         parts.push(fl[f] || '');
     }
-    if (pick.mealS > 1) {
-        const mealL = {breakfast:'适合早餐', lunch:'午餐推荐', dinner:'晚餐推荐', night:'适合夜宵'};
+    if (pick.mealS > 0) {
+        const mealL = {breakfast:'适合早餐', lunch:'适合午餐', dinner:'适合晚餐', night:'适合夜宵'};
         parts.push(mealL[meal] || '');
-    } else if (pick.mealS < -1) {
-        parts.push('不太适合这个时段');
     }
 
     const reason = pick.food.reason(wType, mood, a, f, meal);
