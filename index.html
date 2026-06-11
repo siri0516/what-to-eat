@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="cache-control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>今天吃什么？🍽️</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="吃什么">
+    <meta name="application-name" content="今天吃什么">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    <!-- Theme color for browser chrome -->
+    <meta name="theme-color" content="#0a0a14">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #0a0a14;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #app {
+            background: #12121e;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.04);
+            max-width: 520px;
+            width: 100%;
+        }
+        h1 { text-align: center; color: #fff; font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 0.15rem; }
+        .sub { text-align: center; color: rgba(255,255,255,0.12); font-size: 0.78rem; margin-bottom: 1.3rem; letter-spacing: 1px; }
+
+        /* weather */
+        .sec-label {
+            color: rgba(255,255,255,0.25);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* mood */
+        .btn-group {
+            display: grid;
+            gap: 6px;
+            margin-bottom: 1rem;
+        }
+        #meal-btns { grid-template-columns: repeat(4, 1fr); }
+        #weather-btns, #temp-btns, #mood-btns { grid-template-columns: repeat(5, 1fr); }
+        .m-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 0.5rem 0.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .m-btn:hover { background: rgba(255,255,255,0.06); }
+        .m-btn.sel {
+            background: rgba(78,156,255,0.12);
+            border-color: #4e9cff;
+        }
+        .m-btn.sel .ml { color: #4e9cff; }
+        .m-btn .emoji { font-size: 1.3rem; display: block; margin-bottom: 0.1rem; }
+        .m-btn .ml { color: rgba(255,255,255,0.35); font-size: 0.65rem; }
+
+        /* sliders */
+        .sl-g {
+            margin-bottom: 0.8rem;
+        }
+        .sl-h {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.2rem;
+        }
+        .sl-h .l { color: rgba(255,255,255,0.4); font-size: 0.78rem; }
+        .sl-h .v { color: #fff; font-size: 0.8rem; min-width: 40px; text-align: right; }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 3px;
+            outline: none;
+            touch-action: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: #4e9cff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(78,156,255,0.3);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: #4e9cff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .sl-l {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255,255,255,0.1);
+            font-size: 0.62rem;
+            margin-top: 0.1rem;
+        }
+
+        /* button */
+        #go-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #e94560, #d63851);
+            color: #fff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(233,69,96,0.25);
+            margin-top: 0.2rem;
+        }
+        #go-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(233,69,96,0.4);
+        }
+        #go-btn:active { transform: scale(0.98); }
+
+        /* result */
+        #result {
+            display: none;
+            margin-top: 1rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(78,204,163,0.15);
+            border-radius: 14px;
+            padding: 1.4rem;
+            text-align: center;
+            animation: up 0.4s ease-out;
+        }
+        #result.show { display: block; }
+        @keyframes up {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #result .re { font-size: 2.8rem; margin-bottom: 0.2rem; }
+        #result .rn { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.2rem; }
+        #result .rd { color: rgba(255,255,255,0.35); font-size: 0.85rem; margin-bottom: 0.6rem; line-height: 1.5; }
+        #result .rr {
+            background: rgba(78,204,163,0.05);
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.5;
+        }
+        #result .rr strong { color: #4ecca3; }
+
+        #fb {
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        #fb .fb-lb {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.2);
+            margin-right: 2px;
+        }
+        #fb button {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 0.2rem 0.55rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            opacity: 0.4;
+        }
+        #fb button:hover { background: rgba(255,255,255,0.12); opacity: 1; }
+        #fb .fb-like.act { opacity: 1; border-color: #4ecca3; background: rgba(78,204,163,0.12); }
+        #fb .fb-dislike.act { opacity: 1; border-color: #ff6b6b; background: rgba(255,107,107,0.12); }
+
+        #ra {
+            display: flex;
+            gap: 6px;
+            margin-top: 0.6rem;
+            justify-content: center;
+        }
+        #ra button {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 0.35rem 1rem;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        #ra button:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+        .ft {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: rgba(255,255,255,0.04);
+            font-size: 0.6rem;
+        }
+
+        /* PWA standalone mode */
+        @media all and (display-mode: standalone) {
+            #app { border-radius: 12px; }
+        }
+
+        @media (max-width: 420px) {
+            #app { padding: 1.2rem; border-radius: 16px; }
+            h1 { font-size: 1.25rem; }
+            .sub { font-size: 0.65rem; }
+            .btn-group { gap: 4px; }
+            .m-btn { padding: 0.35rem 0.15rem; }
+            .m-btn .emoji { font-size: 1.1rem; }
+            .m-btn .ml { font-size: 0.55rem; }
+            #result { padding: 1rem; }
+            #result .re { font-size: 2.2rem; }
+            #result .rn { font-size: 1.2rem; }
+        }
+
+        /* Hide scrollbar */
+        ::-webkit-scrollbar { width: 0; }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1>🍽️ 今天吃什么？</h1>
+    <div class="sub">餐类 · 天气 · 气温 · 心情 → 推荐</div>
+
+    <!-- 餐类 -->
+    <div class="sec-label">🍽️ 餐类</div>
+    <div class="btn-group" id="meal-btns">
+        <button class="m-btn sel" data-meal="breakfast"><span class="emoji">🌅</span><span class="ml">早餐</span></button>
+        <button class="m-btn" data-meal="lunch"><span class="emoji">☀️</span><span class="ml">午餐</span></button>
+        <button class="m-btn" data-meal="dinner"><span class="emoji">🌆</span><span class="ml">晚餐</span></button>
+        <button class="m-btn" data-meal="night"><span class="emoji">🌙</span><span class="ml">夜宵</span></button>
+    </div>
+
+    <!-- 天气状况 -->
+    <div class="sec-label">🌤️ 天气状况</div>
+    <div class="btn-group" id="weather-btns">
+        <button class="m-btn sel" data-w="sunny"><span class="emoji">☀️</span><span class="ml">晴天</span></button>
+        <button class="m-btn" data-w="cloudy"><span class="emoji">⛅</span><span class="ml">多云</span></button>
+        <button class="m-btn" data-w="overcast"><span class="emoji">☁️</span><span class="ml">阴天</span></button>
+        <button class="m-btn" data-w="foggy"><span class="emoji">🌫️</span><span class="ml">起雾</span></button>
+        <button class="m-btn" data-w="rainy"><span class="emoji">🌧️</span><span class="ml">下雨</span></button>
+    </div>
+
+    <!-- 气温 -->
+    <div class="sec-label">🌡️ 气温</div>
+    <div class="btn-group" id="temp-btns">
+        <button class="m-btn" data-t="freezing"><span class="emoji">❄️</span><span class="ml">严寒</span></button>
+        <button class="m-btn" data-t="cold"><span class="emoji">🥶</span><span class="ml">寒冷</span></button>
+        <button class="m-btn sel" data-t="moderate"><span class="emoji">😊</span><span class="ml">适中</span></button>
+        <button class="m-btn" data-t="warm"><span class="emoji">🌤️</span><span class="ml">温暖</span></button>
+        <button class="m-btn" data-t="hot"><span class="emoji">☀️</span><span class="ml">炎热</span></button>
+    </div>
+
+    <!-- 心情 -->
+    <div class="sec-label">😊 心情</div>
+    <div class="btn-group" id="mood-btns">
+        <button class="m-btn sel" data-m="happy"><span class="emoji">😄</span><span class="ml">开心</span></button>
+        <button class="m-btn" data-m="sad"><span class="emoji">😢</span><span class="ml">难过</span></button>
+        <button class="m-btn" data-m="stressed"><span class="emoji">😫</span><span class="ml">焦虑</span></button>
+        <button class="m-btn" data-m="tired"><span class="emoji">😴</span><span class="ml">疲惫</span></button>
+        <button class="m-btn" data-m="bored"><span class="emoji">😐</span><span class="ml">无聊</span></button>
+    </div>
+
+    <!-- 胃口 -->
+    <div class="sl-g">
+        <div class="sl-h"><span class="l">🍽️ 胃口</span><span class="v" id="av">刚刚好</span></div>
+        <input type="range" id="as" min="0" max="4" value="2" />
+        <div class="sl-l"><span>😐 没胃口</span><span>🙂 正常</span><span>🤤 胃口大开</span></div>
+    </div>
+
+    <!-- 饱腹 -->
+    <div class="sl-g">
+        <div class="sl-h"><span class="l">🍖 饱腹</span><span class="v" id="fv">正合适</span></div>
+        <input type="range" id="fs" min="0" max="4" value="2" />
+        <div class="sl-l"><span>😫 饿扁了</span><span>😌 正合适</span><span>😵 撑爆了</span></div>
+    </div>
+
+    <!-- 按钮 -->
+    <button id="go-btn">✨ 告诉我吃什么</button>
+
+    <!-- 结果 -->
+    <div id="result">
+        <div class="re" id="re">🍜</div>
+        <div class="rn" id="rn">-</div>
+        <div class="rd" id="rd">-</div>
+        <div class="rr" id="rr"></div>
+        <div id="fb">
+            <span class="fb-lb">这个推荐？</span>
+            <button class="fb-like" data-fb="like" title="喜欢">👍</button>
+            <button class="fb-dislike" data-fb="dislike" title="不喜欢">👎</button>
+        </div>
+        <div id="ra">
+            <button id="r-btn">🎲 换一个</button>
+            <button id="c-btn">📋 复制</button>
+        </div>
+    </div>
+
+    <div class="ft">WHAT TO EAT</div>
+</div>
+
+<!-- 定位弹窗 -->
+
+<script>
+// 美食数据库
+const FOODS = [
+    {
+        name: '重庆火锅', emoji: '🍲',
+        desc: '麻辣鲜香的火锅，涮什么都好吃！',
+        scores: { weather: {sunny:-2, cloudy:0, overcast:3, foggy:3, rainy:3}, mood: {happy:2,sad:3,stressed:3,tired:1,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-3} },
+        reason: function(w,m,a,f) {
+            if (w==='overcast') return '阴天或起雾，吃火锅暖身最合适';
+            if (w==='rainy') return '下雨天和火锅最配了';
+            if (m==='stressed') return '焦虑的时候，辣味最能释放压力';
+            if (m==='sad') return '难过的时候，没有一顿火锅解决不了的';
+            return '火锅永远是经典之选';
+        }
+    },
+    {
+        name: '酸菜鱼', emoji: '🐟',
+        desc: '酸爽开胃，鱼肉鲜嫩，配米饭能吃到撑！',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:2,tired:2,bored:1}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:3,light:0,full:-3} },
+        reason: function(w,m,a,f) {
+            if (m==='tired') return '酸爽的口味最能提振精神';
+            if (w==='overcast'||w==='rainy') return '这种天气来份酸菜鱼，暖胃又开胃';
+            return '酸菜鱼，酸爽嫩滑吃不够';
+        }
+    },
+    {
+        name: '兰州拉面', emoji: '🍜',
+        desc: '一碗热腾腾的牛肉拉面，汤清味浓，暖心暖胃。',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:3, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:0,normal:2,high:2}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='overcast'||w==='foggy') return '阴天或起雾，来碗热拉面暖暖身子';
+            if (w==='rainy') return '下雨天就适合来碗热气腾腾的拉面';
+            if (m==='tired') return '累了就来碗拉面，吃饱就有力气了';
+            return '拉面永远是省心又满足的选择';
+        }
+    },
+    {
+        name: '蛋炒饭', emoji: '🍚',
+        desc: '简单却经典的蛋炒饭，粒粒分明，朴实的美味。',
+        scores: { weather: {sunny:0, cloudy:1, overcast:1, foggy:1, rainy:1}, mood: {happy:1,sad:0,stressed:0,tired:1,bored:-1}, appetite: {low:1,normal:2,high:1}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (f==='hungry') return '饿了吧？蛋炒饭又快又管饱！';
+            if (a==='low') return '没什么胃口的时候，蛋炒饭简单又稳妥';
+            return '蛋炒饭，最简单也最安心';
+        }
+    },
+    {
+        name: '麻辣烫', emoji: '🌶️',
+        desc: '自选食材，麻辣鲜香，一碗满足所有欲望。',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:3,tired:1,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:1,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='stressed') return '压力大的时候，麻辣烫最能解压';
+            return '想吃什么自己选，麻辣烫永远不会错';
+        }
+    },
+    {
+        name: '寿司', emoji: '🍣',
+        desc: '精致鲜美的日式寿司，轻食首选。',
+        scores: { weather: {sunny:3, cloudy:1, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:2,sad:1,stressed:0,tired:0,bored:2}, appetite: {low:1,normal:1,high:0}, fullness: {hungry:0,light:2,full:-1} },
+        reason: function(w,m,a,f) {
+            if (w==='sunny') return '晴天的好日子，吃寿司最清爽';
+            if (m==='bored') return '生活无聊？来点精致的寿司换换心情';
+            return '寿司，清爽又精致的小确幸';
+        }
+    },
+    {
+        name: '黄焖鸡米饭', emoji: '🍗',
+        desc: '酱香浓郁的黄焖鸡，配米饭吃撑到扶墙。',
+        scores: { weather: {sunny:-1, cloudy:1, overcast:2, foggy:2, rainy:2}, mood: {happy:1,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (f==='hungry') return '饿到不行？黄焖鸡米饭管饱！';
+            return '酱香浓郁，米饭杀手，黄焖鸡名不虚传';
+        }
+    },
+    {
+        name: '凉皮', emoji: '🥟',
+        desc: '爽滑筋道的凉皮，酸辣开胃，夏日轻食。',
+        scores: { weather: {sunny:2, cloudy:1, overcast:-2, foggy:-2, rainy:-2}, mood: {happy:2,sad:0,stressed:0,tired:1,bored:1}, appetite: {low:2,normal:1,high:-1}, fullness: {hungry:-2,light:2,full:-1} },
+        reason: function(w,m,a,f) {
+            if (w==='sunny') return '晴天来份凉皮，清爽开胃又舒服';
+            if (a==='low') return '没胃口？凉皮酸辣开胃正合适';
+            return '凉皮酸辣爽口，夏天的灵魂';
+        }
+    },
+    {
+        name: '烤肉', emoji: '🥩',
+        desc: '滋滋冒油的烤肉，肉食者的天堂！',
+        scores: { weather: {sunny:0, cloudy:2, overcast:2, foggy:1, rainy:1}, mood: {happy:3,sad:1,stressed:2,tired:1,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-3} },
+        reason: function(w,m,a,f) {
+            if (m==='happy') return '心情这么好，必须来顿烤肉庆祝！';
+            if (a==='high') return '胃口大开？烤肉大餐安排上！';
+            if (m==='bored') return '无聊？没有什么是一顿烤肉解决不了的';
+            return '烤肉，油脂与火焰的狂欢';
+        }
+    },
+    {
+        name: '小笼包', emoji: '🥟',
+        desc: '薄皮多汁的小笼包，一口一个，满口鲜香。',
+        scores: { weather: {sunny:0, cloudy:1, overcast:1, foggy:1, rainy:1}, mood: {happy:1,sad:1,stressed:0,tired:1,bored:0}, appetite: {low:2,normal:2,high:0}, fullness: {hungry:1,light:2,full:-1} },
+        reason: function(w,m,a,f) {
+            if (a==='low') return '没胃口的时候，小笼包皮薄馅嫩刚刚好';
+            return '小笼包，一口一个的幸福';
+        }
+    },
+    {
+        name: '冰淇淋', emoji: '🍦',
+        desc: '甜蜜冰凉的冰淇淋，一秒降温，心情变好！',
+        scores: { weather: {sunny:3, cloudy:1, overcast:-2, foggy:-3, rainy:-2}, mood: {happy:2,sad:3,stressed:1,tired:0,bored:1}, appetite: {low:1,normal:0,high:-1}, fullness: {hungry:-3,light:1,full:-1} },
+        reason: function(w,m,a,f) {
+            if (w==='sunny') return '热到融化？来支冰淇淋续命！';
+            return '冰淇淋是快乐源泉！';
+        }
+    },
+    {
+        name: '螺蛳粉', emoji: '🍝',
+        desc: '酸辣鲜香的螺蛳粉，闻着臭吃着香！',
+        scores: { weather: {sunny:0, cloudy:1, overcast:2, foggy:2, rainy:2}, mood: {happy:1,sad:2,stressed:3,tired:1,bored:3}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:1,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='stressed') return '压力大的时候，螺蛳粉的酸爽最解压';
+            if (m==='bored') return '无聊了？来碗螺蛳粉刺激一下味蕾';
+            return '螺蛳粉，越吃越上瘾的神奇美味';
+        }
+    },
+    {
+        name: '糖醋里脊', emoji: '🥓',
+        desc: '外酥里嫩的糖醋里脊，酸甜可口，米饭绝配。',
+        scores: { weather: {sunny:0, cloudy:1, overcast:1, foggy:1, rainy:0}, mood: {happy:2,sad:2,stressed:0,tired:1,bored:0}, appetite: {low:0,normal:2,high:1}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='sad') return '难过的时候，吃点甜的安慰自己';
+            return '糖醋里脊，酸甜可口，米饭杀手';
+        }
+    },
+    {
+        name: '饺子', emoji: '🥟',
+        desc: '皮薄馅大的手工饺子，蘸醋吃最香。',
+        scores: { weather: {sunny:-1, cloudy:1, overcast:2, foggy:2, rainy:2}, mood: {happy:1,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:1,normal:2,high:1}, fullness: {hungry:2,light:1,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='overcast'||w==='rainy') return '阴天或雨天，吃饺子最暖心';
+            if (f==='hungry') return '饿的时候，饺子管饱又满足';
+            return '饺子，家的味道';
+        }
+    },
+    {
+        name: '麻辣香锅', emoji: '🥘',
+        desc: '自选食材大火爆炒，麻辣鲜香，超过瘾！',
+        scores: { weather: {sunny:-1, cloudy:1, overcast:2, foggy:2, rainy:2}, mood: {happy:2,sad:1,stressed:3,tired:1,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-3} },
+        reason: function(w,m,a,f) {
+            if (m==='stressed') return '压力大？麻辣香锅配米饭，辣到释放！';
+            if (a==='high') return '胃口大开！麻辣香锅配三碗饭！';
+            return '麻辣香锅，想吃什么自己搭配';
+        }
+    },
+    {
+        name: '清粥小菜', emoji: '🥣',
+        desc: '温热白粥配几碟小菜，清淡养胃。',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:1, foggy:1, rainy:2}, mood: {happy:0,sad:2,stressed:0,tired:1,bored:-1}, appetite: {low:3,normal:0,high:-2}, fullness: {hungry:-1,light:2,full:0} },
+        reason: function(w,m,a,f) {
+            if (a==='low') return '完全没胃口？喝碗清粥养养胃';
+            if (m==='sad') return '难过得吃不下的时候，粥最温柔';
+            return '清淡的粥，是对胃的温柔';
+        }
+    },
+    {
+        name: '披萨', emoji: '🍕',
+        desc: '芝士拉丝的披萨，料多味足，分享更快乐。',
+        scores: { weather: {sunny:1, cloudy:1, overcast:0, foggy:0, rainy:0}, mood: {happy:2,sad:1,stressed:0,tired:1,bored:2}, appetite: {low:0,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='happy') return '开心的时候，披萨让快乐加倍！';
+            if (m==='bored') return '无聊？叫个披萨看剧多舒服';
+            return '披萨，拉丝的快乐谁懂啊';
+        }
+    },
+    {
+        name: '炸鸡啤酒', emoji: '🍗',
+        desc: '酥脆炸鸡配冰啤酒，快乐肥宅套餐！',
+        scores: { weather: {sunny:2, cloudy:1, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:2,sad:3,stressed:2,tired:0,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='sad') return '难过的时候，炸鸡啤酒最治愈';
+            if (m==='bored') return '无聊的晚上，炸鸡啤酒是标配';
+            return '炸鸡啤酒，快乐就是这么简单';
+        }
+    },
+    {
+        name: '肠粉', emoji: '🫘',
+        desc: '滑嫩细腻的广式肠粉，早餐轻食两相宜。',
+        scores: { weather: {sunny:1, cloudy:1, overcast:0, foggy:0, rainy:0}, mood: {happy:1,sad:1,stressed:0,tired:1,bored:0}, appetite: {low:2,normal:1,high:0}, fullness: {hungry:0,light:2,full:-1} },
+        reason: function(w,m,a,f) {
+            if (a==='low') return '没什么胃口？来份滑嫩的肠粉正好';
+            return '肠粉，滑滑嫩嫩，简简单单';
+        }
+    },
+    {
+        name: '烧烤', emoji: '🍢',
+        desc: '炭火慢烤的串串，烟火气十足，越夜越美味。',
+        scores: { weather: {sunny:3, cloudy:2, overcast:-1, foggy:-1, rainy:-2}, mood: {happy:3,sad:1,stressed:2,tired:0,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='sunny') return '晴天的夜晚，烧烤啤酒最配了';
+            if (m==='happy') return '这么开心的日子，必须烧烤走起！';
+            return '烧烤，人间烟火气最抚凡人心';
+        }
+    },
+    {
+        name: '煲仔饭', emoji: '🍚',
+        desc: '锅巴香脆的煲仔饭，腊味飘香，料足管饱。',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:2, rainy:2}, mood: {happy:0,sad:1,stressed:1,tired:2,bored:1}, appetite: {low:0,normal:1,high:2}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='overcast'||w==='rainy') return '阴天或下雨，煲仔饭暖心又暖胃';
+            if (f==='hungry') return '肚子饿的时候，煲仔饭最实在';
+            return '煲仔饭，锅巴和腊味的完美结合';
+        }
+    },
+    {
+        name: '甜品奶茶', emoji: '🧋',
+        desc: '甜蜜的甜品配奶茶，治愈系下午茶首选。',
+        scores: { weather: {sunny:2, cloudy:1, overcast:0, foggy:0, rainy:1}, mood: {happy:2,sad:3,stressed:2,tired:2,bored:1}, appetite: {low:2,normal:1,high:-1}, fullness: {hungry:-3,light:2,full:-1} },
+        reason: function(w,m,a,f) {
+            if (m==='sad') return '心情不好的时候，糖分最治愈';
+            if (m==='tired') return '累了？奶茶续命来一杯';
+            return '甜品和奶茶，是生活的甜味剂';
+        }
+    },
+    {
+        name: '水煮鱼', emoji: '🐠',
+        desc: '麻辣鲜香的水煮鱼，鱼肉嫩滑，配饭一绝。',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:2, rainy:2}, mood: {happy:1,sad:1,stressed:3,tired:0,bored:1}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='stressed') return '压力大的时候，来盆水煮鱼辣到爽';
+            if (a==='high') return '胃口大开就该来盆水煮鱼，过瘾！';
+            return '水煮鱼，麻辣鲜嫩停不下来';
+        }
+    },
+    {
+        name: '咖喱饭', emoji: '🍛',
+        desc: '浓郁咖喱配白米饭，简单美味，满足感爆棚。',
+        scores: { weather: {sunny:0, cloudy:0, overcast:1, foggy:2, rainy:2}, mood: {happy:1,sad:1,stressed:1,tired:2,bored:0}, appetite: {low:0,normal:2,high:1}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='tired') return '累了？咖喱饭简单又管饱';
+            if (f==='hungry') return '饿了出来，咖喱饭最实在';
+            return '咖喱饭，浓郁美味，一碗就满足';
+        }
+    },
+    {
+        name: '水果拼盘', emoji: '🍉',
+        desc: '新鲜时令水果拼盘，清甜解暑，健康轻食。',
+        scores: { weather: {sunny:3, cloudy:1, overcast:-2, foggy:-2, rainy:-1}, mood: {happy:1,sad:1,stressed:0,tired:1,bored:0}, appetite: {low:2,normal:0,high:-1}, fullness: {hungry:-3,light:2,full:-1} },
+        reason: function(w,m,a,f) {
+            if (w==='sunny') return '晴天就该吃水果，清甜解暑';
+            if (a==='low') return '天热没胃口？水果拼盘清爽一下';
+            return '水果，大自然给的甜';
+        }
+    },
+    {
+        name: '烤鱼', emoji: '🐟',
+        desc: '炭火烤鱼外焦里嫩，麻辣鲜香，越煮越入味。',
+        scores: { weather: {sunny:-1, cloudy:1, overcast:2, foggy:2, rainy:2}, mood: {happy:2,sad:1,stressed:2,tired:0,bored:1}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='overcast'||w==='rainy') return '阴天或雨天，烤鱼配菜暖心暖胃';
+            if (a==='high') return '胃口大开，烤鱼安排上！';
+            return '烤鱼，外焦里嫩的美味';
+        }
+    },
+    {
+        name: '米线', emoji: '🍜',
+        desc: '爽滑米线配上浓郁汤底，暖心暖胃，一碗就饱。',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:3, rainy:3}, mood: {happy:0,sad:2,stressed:1,tired:2,bored:0}, appetite: {low:1,normal:2,high:1}, fullness: {hungry:2,light:1,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='foggy'||w==='rainy') return '起雾或下雨，来碗热米线最舒服';
+            if (m==='tired') return '累了？一碗米线下去，元气满满';
+            return '米线，爽滑汤浓，简简单单的美味';
+        }
+    },
+    {
+        name: '汉堡薯条', emoji: '🍔',
+        desc: '厚实多汁的汉堡配酥脆薯条，经典快餐，快速管饱。',
+        scores: { weather: {sunny:1, cloudy:1, overcast:0, foggy:0, rainy:0}, mood: {happy:2,sad:1,stressed:1,tired:2,bored:1}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:2,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (m==='tired') return '累了懒得动？汉堡薯条最快最方便';
+            if (f==='hungry') return '饿急了？汉堡薯条立马填饱肚子';
+            return '汉堡薯条，经典快餐永不过时';
+        }
+    },
+    {
+        name: '日式拉面', emoji: '🍜',
+        desc: '浓郁豚骨汤底配上弹牙拉面，溏心蛋是灵魂。',
+        scores: { weather: {sunny:-1, cloudy:1, overcast:3, foggy:3, rainy:3}, mood: {happy:1,sad:2,stressed:1,tired:2,bored:1}, appetite: {low:0,normal:2,high:2}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='overcast'||w==='foggy') return '阴天或起雾，日式拉面最能暖身';
+            if (w==='rainy') return '下雨天来碗浓汤拉面，幸福感满满';
+            return '日式拉面，汤浓面劲，治愈系美食';
+        }
+    },
+    {
+        name: '小龙虾', emoji: '🦞',
+        desc: '麻辣鲜香的小龙虾，剥壳的乐趣谁能抵抗！',
+        scores: { weather: {sunny:3, cloudy:2, overcast:-1, foggy:-1, rainy:-1}, mood: {happy:3,sad:1,stressed:2,tired:0,bored:2}, appetite: {low:-2,normal:0,high:3}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='sunny') return '晴朗的日子，小龙虾配啤酒最过瘾';
+            if (m==='happy') return '心情这么好，来份小龙虾庆祝！';
+            return '小龙虾，剥壳的快乐谁吃谁知道';
+        }
+    },
+    {
+        name: '部队火锅', emoji: '🥘',
+        desc: '韩式部队锅，泡面年糕午餐肉，一锅煮天下。',
+        scores: { weather: {sunny:-1, cloudy:0, overcast:2, foggy:2, rainy:3}, mood: {happy:1,sad:2,stressed:2,tired:1,bored:2}, appetite: {low:-1,normal:1,high:2}, fullness: {hungry:3,light:0,full:-2} },
+        reason: function(w,m,a,f) {
+            if (w==='rainy') return '下雨天煮一锅部队锅，暖呼呼的超满足';
+            if (m==='bored') return '生活单调？部队锅可以治愈你';
+            return '部队锅，一锅煮出幸福感';
+        }
+    }
+];
+
+// ---------- 状态 ----------
+let meal = 'breakfast';
+let wType = 'sunny';   // weather type
+let temp = 'moderate';
+let mood = 'happy';
+let appetite = 2;       // 0-4
+let fullness = 2;       // 0-4
+
+// ========== Toast 轻提示 ==========
+
+function showToast(msg) {
+    const existing = document.querySelector('.wt-toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'wt-toast';
+    t.textContent = msg;
+    Object.assign(t.style, {
+        position: 'fixed', bottom: '100px', left: '50%', transform: 'translateX(-50%)',
+        background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '10px 20px',
+        borderRadius: '12px', fontSize: '0.85rem', zIndex: '10000',
+        maxWidth: '320px', textAlign: 'center',
+        backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)',
+        transition: 'opacity 0.4s'
+    });
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 2500);
+}
+
+// ---------- DOM 引用 ----------
+const $ = id => document.getElementById(id);
+
+// ---------- 反馈系统 ----------
+let _curFood = null;
+
+function loadFB() {
+    try { return JSON.parse(localStorage.getItem('food_feedback')) || {}; } catch { return {}; }
+}
+function saveFB(fb) { localStorage.setItem('food_feedback', JSON.stringify(fb)); }
+
+function giveFB(name, type) {
+    const fb = loadFB();
+    const cur = fb[name] || 0;
+    // 点击已激活的按钮 -> 取消反馈；否则设置
+    if (type === 'like') {
+        fb[name] = cur > 0 ? 0 : 1;
+    } else {
+        fb[name] = cur < 0 ? 0 : -1;
+    }
+    saveFB(fb);
+    updateFBUI();
+}
+
+function updateFBUI() {
+    if (!_curFood) return;
+    const fb = loadFB();
+    const val = fb[_curFood.name] || 0;
+    const likeBtn = document.querySelector('.fb-like');
+    const dislikeBtn = document.querySelector('.fb-dislike');
+    if (!likeBtn) return;
+    likeBtn.classList.toggle('act', val > 0);
+    dislikeBtn.classList.toggle('act', val < 0);
+}
+
+// ---------- 推荐逻辑 ----------
+function getRecommendation() {
+    const aMap = {0:'low',1:'low',2:'normal',3:'high',4:'high'};
+    const fMap = {0:'hungry',1:'hungry',2:'light',3:'full',4:'full'};
+    const a = aMap[appetite];
+    const f = fMap[fullness];
+    const fb = loadFB();
+
+    // 评分
+    let scored = FOODS.map(food => {
+        const ws = food.scores.weather[wType] || 0;
+        const ms = food.scores.mood[mood] || 0;
+        const as = food.scores.appetite[a] || 0;
+        const fs = food.scores.fullness[f] || 0;
+        const fbAdj = (fb[food.name] || 0) * 1.5;
+        const total = ws * 1.0 + ms * 1.5 + as * 1.5 + fs * 2.0 + fbAdj;
+        return { food, total, ws, ms, as, fs };
+    });
+
+    scored.sort((a, b) => {
+        if (Math.abs(b.total - a.total) < 0.5) return Math.random() - 0.5;
+        return b.total - a.total;
+    });
+
+    // 从 top 3 随机
+    const idx = Math.random() < 0.65 ? 0 : (Math.random() < 0.5 ? 1 : 2);
+    const pick = scored[Math.min(idx, scored.length - 1)];
+
+    // 原因
+    let parts = [];
+    if (pick.ws > 0) {
+        const wl = {sunny:'晴天',cloudy:'多云',overcast:'阴天',foggy:'起雾',rainy:'下雨天'};
+        parts.push(wl[wType] || '');
+    }
+    if (pick.ms > 0) {
+        const ml = {happy:'开心',sad:'难过',stressed:'压力大',tired:'疲惫',bored:'无聊'};
+        parts.push(ml[mood] || '');
+    }
+    if (pick.as > 0) {
+        const al = {low:'没胃口',normal:'食欲正好',high:'胃口大开'};
+        parts.push(al[a] || '');
+    }
+    if (pick.fs > 0) {
+        const fl = {hungry:'肚子饿',light:'刚好',full:'有点饱'};
+        parts.push(fl[f] || '');
+    }
+
+    const reason = pick.food.reason(wType, mood, a, f);
+    const extra = parts.length > 0 ? `<br><span style="font-size:0.7rem;color:rgba(255,255,255,0.2);">综合：${parts.join(' · ')}</span>` : '';
+
+    return {
+        name: pick.food.name,
+        emoji: pick.food.emoji || '🍽️',
+        desc: pick.food.desc,
+        reason: `<strong>${reason}</strong>${extra}`
+    };
+}
+
+// ---------- 显示结果 ----------
+function showResult() {
+    const r = getRecommendation();
+    _curFood = r;
+    $('re').textContent = r.emoji;
+    $('rn').textContent = r.name;
+    $('rd').textContent = r.desc;
+    $('rr').innerHTML = r.reason;
+    $('result').classList.add('show');
+    updateFBUI();
+}
+
+// ---------- 绑定事件 ----------
+document.addEventListener('DOMContentLoaded', function() {
+
+    // 餐类按钮
+    document.querySelectorAll('#meal-btns .m-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#meal-btns .m-btn').forEach(b => b.classList.remove('sel'));
+            this.classList.add('sel');
+            meal = this.dataset.meal;
+        });
+    });
+
+    // 天气状况按钮
+    document.querySelectorAll('#weather-btns .m-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#weather-btns .m-btn').forEach(b => b.classList.remove('sel'));
+            this.classList.add('sel');
+            wType = this.dataset.w;
+        });
+    });
+
+    // 气温按钮
+    document.querySelectorAll('#temp-btns .m-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#temp-btns .m-btn').forEach(b => b.classList.remove('sel'));
+            this.classList.add('sel');
+            temp = this.dataset.t;
+        });
+    });
+
+    // 心情按钮
+    document.querySelectorAll('#mood-btns .m-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#mood-btns .m-btn').forEach(b => b.classList.remove('sel'));
+            this.classList.add('sel');
+            mood = this.dataset.m;
+        });
+    });
+
+    // 食欲 slider
+    const aLabels = ['完全没胃口','不太想吃','刚刚好','胃口不错','胃口大开'];
+    $('as').addEventListener('input', function() {
+        appetite = Math.round(parseFloat(this.value));
+        $('av').textContent = aLabels[appetite];
+    });
+
+    // 饱腹 slider
+    const fLabels = ['饿扁了','有点饿','正合适','有点撑','撑爆了'];
+    $('fs').addEventListener('input', function() {
+        fullness = Math.round(parseFloat(this.value));
+        $('fv').textContent = fLabels[fullness];
+    });
+
+    // 主按钮
+    $('go-btn').addEventListener('click', showResult);
+
+    // 换一个
+    $('r-btn').addEventListener('click', showResult);
+
+    // 反馈按钮
+    document.querySelector('.fb-like').addEventListener('click', function() {
+        if (_curFood) giveFB(_curFood.name, 'like');
+    });
+    document.querySelector('.fb-dislike').addEventListener('click', function() {
+        if (_curFood) giveFB(_curFood.name, 'dislike');
+    });
+
+    // 复制
+    $('c-btn').addEventListener('click', function() {
+        const text = `🍽️ 今天推荐吃：${$('re').textContent} ${$('rn').textContent}\n${$('rd').textContent}`;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                this.textContent = '✅ 已复制';
+                setTimeout(() => { this.textContent = '📋 复制'; }, 2000);
+            });
+        } else {
+            // fallback
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            this.textContent = '✅ 已复制';
+            setTimeout(() => { this.textContent = '📋 复制'; }, 2000);
+        }
+    });
+
+    // 初始化（按钮组默认已设置好 sel 状态）
+});
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+    });
+}
+</script>
+</body>
+</html>
